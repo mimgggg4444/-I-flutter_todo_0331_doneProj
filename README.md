@@ -1,6 +1,8 @@
 # flutter_todo_0331
 
 CRUD app
+![todo2-2](https://github.com/mimgggg4444/flutter_todo_0331/assets/66135779/7ae9a433-71da-4aa9-baee-717216dee1fa)
+![todo2-1](https://github.com/mimgggg4444/flutter_todo_0331/assets/66135779/acc09e00-31e1-4dbd-a480-dc3ba8bdc2a5)
 
 ## Getting Started
 
