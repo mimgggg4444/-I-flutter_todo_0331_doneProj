@@ -52,7 +52,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
           ),
           TextField(
             controller: descriptController,
-            decoration: InputDecoration(hintText: '제목'),
+            decoration: InputDecoration(hintText: '내용'),
             keyboardType: TextInputType.multiline,
             minLines: 5,
             maxLines: 8,
@@ -75,7 +75,36 @@ class _AddTodoPageState extends State<AddTodoPage> {
   }
 
   Future<void> updateData() async {
+    final todo = widget.todo;
+    if (todo == null) {
+      print('업데이트 오류');
+      return;
+    }
+    final id = todo['_id'];
 
+    final title = titleController.text;
+    final description = descriptController.text;
+    final body = {
+      "title": title,
+      "description": description,
+      "is_completed": false,
+    };
+    //submit updated to the server
+    final url = 'https://api.nstack.in/v1/$id';
+    final uri = Uri.parse(url);
+    final respose = await http.put(
+      uri,
+      body: jsonEncode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
+    if (respose.statusCode == 200) {
+
+
+      showSuccessMessage('creation success');
+      print('creation success');
+    } else {
+      showErrorMessage('creation failed');
+    }
   }
 
   Future<void> submitData() async {
