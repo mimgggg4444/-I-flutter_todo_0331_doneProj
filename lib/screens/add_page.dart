@@ -5,7 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class AddTodoPage extends StatefulWidget {
-  const AddTodoPage({super.key});
+  final Map? todo;
+
+  const AddTodoPage({
+    super.key,
+    this.todo,
+  });
 
   @override
   State<AddTodoPage> createState() => _AddTodoPageState();
@@ -14,12 +19,29 @@ class AddTodoPage extends StatefulWidget {
 class _AddTodoPageState extends State<AddTodoPage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptController = TextEditingController();
+  bool isEdit = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    final todo = widget.todo;
+    if (todo != null) {
+      isEdit = true;
+      final title = todo['title'];
+      final description = todo['description'];
+      titleController.text = title;
+      descriptController.text = description;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('추가'),
+        title: Text(
+          isEdit ? '수정' : '추가',
+        ),
       ),
       body: ListView(
         padding: EdgeInsets.all(20),
@@ -39,12 +61,21 @@ class _AddTodoPageState extends State<AddTodoPage> {
             height: 20,
           ),
           ElevatedButton(
-            onPressed: submitData,
-            child: Text('저장'),
+            onPressed: isEdit ? updateData : submitData,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                isEdit ? '업데이트' : '저장',
+              ),
+            ),
           )
         ],
       ),
     );
+  }
+
+  Future<void> updateData() async {
+
   }
 
   Future<void> submitData() async {
@@ -65,8 +96,8 @@ class _AddTodoPageState extends State<AddTodoPage> {
     );
 
     if (respose.statusCode == 201) {
-      titleController.text='';
-      descriptController.text='';
+      titleController.text = '';
+      descriptController.text = '';
       showSuccessMessage('creation success');
       print('creation success');
     } else {
@@ -82,8 +113,8 @@ class _AddTodoPageState extends State<AddTodoPage> {
   void showErrorMessage(String message) {
     final snackBar = SnackBar(
       content: Text(
-          message,
-      style: TextStyle(color: Colors.white),
+        message,
+        style: TextStyle(color: Colors.white),
       ),
       backgroundColor: Colors.red,
     );

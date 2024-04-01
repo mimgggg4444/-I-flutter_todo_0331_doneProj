@@ -46,6 +46,7 @@ class _TodoListPageState extends State<TodoListPage> {
                   onSelected: (value) {
                     if (value == 'edit') {
                       //open edit page
+                      navigateToEditPage(item);
                     } else if (value == 'delete') {
                       //delete and remove the item
                       deleteById(id);
@@ -56,6 +57,7 @@ class _TodoListPageState extends State<TodoListPage> {
                       PopupMenuItem(
                         child: Text('수정'),
                         value: 'edit',
+
                       ),
                       PopupMenuItem(
                         child: Text('삭제'),
@@ -76,11 +78,22 @@ class _TodoListPageState extends State<TodoListPage> {
     );
   }
 
-  void navigateToAddPage() {
+  void navigateToEditPage(Map item) {
+    final route = MaterialPageRoute(
+      builder: (context) => AddTodoPage(todo: item),
+    );
+    Navigator.push(context, route);
+  }
+
+  Future<void> navigateToAddPage()async {
     final route = MaterialPageRoute(
       builder: (context) => AddTodoPage(),
     );
-    Navigator.push(context, route);
+    await Navigator.push(context, route);
+    setState(() {
+      isLoading = true;
+    });
+    fetchTodo();
   }
 
   Future<void> deleteById(String id) async {
@@ -88,19 +101,16 @@ class _TodoListPageState extends State<TodoListPage> {
     final url = 'https://api.nstack.in/v1/todos/$id';
     final uri = Uri.parse(url);
     final response = await http.delete(uri);
-    if(response.statusCode == 200){
+    if (response.statusCode == 200) {
       //remove item from the list
       final filtered = items.where((element) => element['_id'] != id).toList();
       setState(() {
         items = filtered;
       });
-    }else{
+    } else {
       //show error
       showErrorMessage('오류: 메시지가 삭제되지 않았습니다.');
-
     }
-
-
   }
 
   Future<void> fetchTodo() async {
@@ -117,12 +127,6 @@ class _TodoListPageState extends State<TodoListPage> {
     setState(() {
       isLoading = false;
     });
-  }
-
-
-  void showSuccessMessage(String message) {
-    final snackBar = SnackBar(content: Text(message));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void showErrorMessage(String message) {
