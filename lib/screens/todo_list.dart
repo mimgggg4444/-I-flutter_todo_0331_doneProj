@@ -37,10 +37,33 @@ class _TodoListPageState extends State<TodoListPage> {
             itemCount: items.length,
             itemBuilder: (context, index) {
               final item = items[index] as Map;
+              final id = item['_id'] as String;
               return ListTile(
                 leading: CircleAvatar(child: Text('${index + 1}')),
                 title: Text(item['title']),
                 subtitle: Text(item['description']),
+                trailing: PopupMenuButton(
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      //open edit page
+                    } else if (value == 'delete') {
+                      //delete and remove the item
+                      deleteById(id);
+                    }
+                  },
+                  itemBuilder: (context) {
+                    return [
+                      PopupMenuItem(
+                        child: Text('수정'),
+                        value: 'edit',
+                      ),
+                      PopupMenuItem(
+                        child: Text('삭제'),
+                        value: 'delete',
+                      ),
+                    ];
+                  },
+                ),
               );
             },
           ),
@@ -60,9 +83,28 @@ class _TodoListPageState extends State<TodoListPage> {
     Navigator.push(context, route);
   }
 
-  Future<void> fetchTodo() async {
+  Future<void> deleteById(String id) async {
+    //delete the item
+    final url = 'https://api.nstack.in/v1/todos/$id';
+    final uri = Uri.parse(url);
+    final response = await http.delete(uri);
+    if(response.statusCode == 200){
+      //remove item from the list
+      final filtered = items.where((element) => element['_id'] != id).toList();
+      setState(() {
+        items = filtered;
+      });
+    }else{
+      //show error
+      showErrorMessage('오류: 메시지가 삭제되지 않았습니다.');
 
-    final url = 'https://api.nstack.in/v1/todos?page=1&limit=100';
+    }
+
+
+  }
+
+  Future<void> fetchTodo() async {
+    final url = 'https://api.nstack.in/v1/todos?page=1&limit=10';
     final uri = Uri.parse(url);
     final response = await http.get(uri);
     if (response.statusCode == 200) {
@@ -75,5 +117,22 @@ class _TodoListPageState extends State<TodoListPage> {
     setState(() {
       isLoading = false;
     });
+  }
+
+
+  void showSuccessMessage(String message) {
+    final snackBar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void showErrorMessage(String message) {
+    final snackBar = SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.red,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
