@@ -90,7 +90,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
       "is_completed": false,
     };
     //submit updated to the server
-    final url = 'https://api.nstack.in/v1/$id';
+    final url = 'https://api.nstack.in/v1/todos/$id';
     final uri = Uri.parse(url);
     final respose = await http.put(
       uri,
@@ -98,8 +98,6 @@ class _AddTodoPageState extends State<AddTodoPage> {
       headers: {'Content-Type': 'application/json'},
     );
     if (respose.statusCode == 200) {
-
-
       showSuccessMessage('creation success');
       print('creation success');
     } else {
