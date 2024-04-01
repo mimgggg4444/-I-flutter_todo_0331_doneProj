@@ -98,8 +98,8 @@ class _AddTodoPageState extends State<AddTodoPage> {
       headers: {'Content-Type': 'application/json'},
     );
     if (respose.statusCode == 200) {
-      showSuccessMessage('creation success');
-      print('creation success');
+      showSuccessMessage('Updation success');
+      print('Updation success');
     } else {
       showErrorMessage('creation failed');
     }
