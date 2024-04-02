@@ -1,8 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_todo_0331/services/todo_service.dart';
+import '../utils/snackbar_helper.dart';
 
 class AddTodoPage extends StatefulWidget {
   final Map? todo;
@@ -82,69 +80,37 @@ class _AddTodoPageState extends State<AddTodoPage> {
     }
     final id = todo['_id'];
 
-    final title = titleController.text;
-    final description = descriptController.text;
-    final body = {
-      "title": title,
-      "description": description,
-      "is_completed": false,
-    };
     //submit updated to the server
-    final url = 'https://api.nstack.in/v1/todos/$id';
-    final uri = Uri.parse(url);
-    final respose = await http.put(
-      uri,
-      body: jsonEncode(body),
-      headers: {'Content-Type': 'application/json'},
-    );
-    if (respose.statusCode == 200) {
-      showSuccessMessage('Updation success');
+    final isSuccess = await TodoService.updateTodo(id, body);
+    if (isSuccess) {
+      showSuccessMessage(context, message: 'Updation success');
       print('Updation success');
     } else {
-      showErrorMessage('creation failed');
+      showErrorMessage(context, message: 'creation failed');
     }
   }
 
   Future<void> submitData() async {
+    //submit data to the server
+    final isSuccess = await TodoService.addTodo(body);
+
+    if (isSuccess) {
+      titleController.text = '';
+      descriptController.text = '';
+      showSuccessMessage(context, message: 'creation success');
+    } else {
+      showErrorMessage(context, message: 'creation failed');
+    }
+  }
+
+  Map get body {
+    // get the data from form
     final title = titleController.text;
     final description = descriptController.text;
-    final body = {
+    return {
       "title": title,
       "description": description,
       "is_completed": false,
     };
-
-    final url = 'https://api.nstack.in/v1/todos';
-    final uri = Uri.parse(url);
-    final respose = await http.post(
-      uri,
-      body: jsonEncode(body),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (respose.statusCode == 201) {
-      titleController.text = '';
-      descriptController.text = '';
-      showSuccessMessage('creation success');
-      print('creation success');
-    } else {
-      showErrorMessage('creation failed');
-    }
-  }
-
-  void showSuccessMessage(String message) {
-    final snackBar = SnackBar(content: Text(message));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  void showErrorMessage(String message) {
-    final snackBar = SnackBar(
-      content: Text(
-        message,
-        style: TextStyle(color: Colors.white),
-      ),
-      backgroundColor: Colors.red,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_0331/screens/add_page.dart';
 import 'package:flutter_todo_0331/services/todo_service.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_todo_0331/widget/todo_card.dart';
+import '../utils/snackbar_helper.dart';
 
 class TodoListPage extends StatefulWidget {
   const TodoListPage({super.key});
@@ -47,36 +46,12 @@ class _TodoListPageState extends State<TodoListPage> {
               padding: EdgeInsets.all(8),
               itemBuilder: (context, index) {
                 final item = items[index] as Map;
-                final id = item['_id'] as String;
-                return Card(
-                  child: ListTile(
-                    leading: CircleAvatar(child: Text('${index + 1}')),
-                    title: Text(item['title']),
-                    subtitle: Text(item['description']),
-                    trailing: PopupMenuButton(
-                      onSelected: (value) {
-                        if (value == 'edit') {
-                          //open edit page
-                          navigateToEditPage(item);
-                        } else if (value == 'delete') {
-                          //delete and remove the item
-                          deleteById(id);
-                        }
-                      },
-                      itemBuilder: (context) {
-                        return [
-                          PopupMenuItem(
-                            child: Text('수정'),
-                            value: 'edit',
-                          ),
-                          PopupMenuItem(
-                            child: Text('삭제'),
-                            value: 'delete',
-                          ),
-                        ];
-                      },
-                    ),
-                  ),
+
+                return TodoCard(
+                  index: index,
+                  item: item,
+                  navigateEdit: navigateToEditPage,
+                  deleteById: deleteById,
                 );
               },
             ),
@@ -123,7 +98,8 @@ class _TodoListPageState extends State<TodoListPage> {
       });
     } else {
       //show error
-      showErrorMessage('오류: 메시지가 삭제되지 않았습니다.');
+
+      showErrorMessage(context, message: '오류: 메시지가 삭제되지 않았습니다.');
     }
   }
 
@@ -133,22 +109,11 @@ class _TodoListPageState extends State<TodoListPage> {
       setState(() {
         items = response;
       });
-    }else{
-      showErrorMessage('something went wrong');
+    } else {
+      showErrorMessage(context, message: 'something went wrong');
     }
     setState(() {
       isLoading = false;
     });
-  }
-
-  void showErrorMessage(String message) {
-    final snackBar = SnackBar(
-      content: Text(
-        message,
-        style: TextStyle(color: Colors.white),
-      ),
-      backgroundColor: Colors.red,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

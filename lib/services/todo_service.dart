@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 
 class TodoService {
@@ -19,8 +18,30 @@ class TodoService {
       final json = jsonDecode(response.body) as Map;
       final result = json['items'] as List;
       return result;
-    }else{
+    } else {
       return null;
     }
+  }
+
+  static Future<bool> updateTodo(String id, Map body) async {
+    final url = 'https://api.nstack.in/v1/todos/$id';
+    final uri = Uri.parse(url);
+    final respose = await http.put(
+      uri,
+      body: jsonEncode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
+    return respose.statusCode == 200;
+  }
+
+  static Future<bool> addTodo(Map body) async {
+    final url = 'https://api.nstack.in/v1/todos';
+    final uri = Uri.parse(url);
+    final respose = await http.post(
+      uri,
+      body: jsonEncode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
+    return respose.statusCode == 201;
   }
 }
