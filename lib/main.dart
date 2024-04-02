@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_0331/screens/todo_list.dart';
 
-void main(){
+void main() {
   runApp(MyApp());
 }
 
@@ -14,7 +14,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       home: TodoListPage(),
-
     );
   }
 }
